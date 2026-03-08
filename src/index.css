@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 217 30% 7%;
+    --foreground: 0 0% 100%;
+    --sidebar: 223 26% 13%;
+    --card: 224 33% 16%;
+    --card-foreground: 0 0% 100%;
+    --primary: 217 85% 54%;
+    --primary-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --danger: 0 84% 60%;
+    --warning: 38 92% 50%;
+    --secondary: 220 15% 57%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 25% 24%;
+    --muted-foreground: 220 14% 68%;
+    --accent: 217 85% 54%;
+    --accent-foreground: 0 0% 100%;
+    --popover: 224 33% 16%;
+    --popover-foreground: 0 0% 100%;
+    --border: 220 29% 18%;
+    --input: 220 29% 25%;
+    --ring: 217 85% 54%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .spacing-xs {
+    @apply p-1;
+  }
+  .spacing-sm {
+    @apply p-2;
+  }
+  .spacing-md {
+    @apply p-4;
+  }
+  .spacing-lg {
+    @apply p-6;
+  }
+  .spacing-xl {
+    @apply p-8;
+  }
+}
