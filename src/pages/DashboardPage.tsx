@@ -1,54 +1,83 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/ui'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { DashboardChartsSection } from '@/components/dashboard/DashboardChartsSection'
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
+import { DashboardKpiSection } from '@/components/dashboard/DashboardKpiSection'
+import { DashboardLatestTransactionsCard } from '@/components/dashboard/DashboardLatestTransactionsCard'
+import { DashboardPeriodTabs, type PeriodKey } from '@/components/dashboard/DashboardPeriodTabs'
+import { useCategorySummary } from '@/hooks/useCategorySummary'
+import { useMonthlySummary } from '@/hooks/useMonthlySummary'
+import { useSummary } from '@/hooks/useSummary'
+import { useTransactions } from '@/hooks/useTransactions'
+import type { ListTransactionsParams } from '@/types/transaction'
+import { toMonthParam } from '@/utils/date'
 
-const periods = ['7 Dias', '30 Dias', 'Este Mes', 'Personalizado']
+function monthFromPeriod(period: PeriodKey) {
+  const now = new Date()
+  if (period === 'previous') {
+    now.setMonth(now.getMonth() - 1)
+  }
+  return toMonthParam(now)
+}
+
+function transactionFiltersFromPeriod(period: PeriodKey): ListTransactionsParams {
+  if (period === '7d' || period === '30d') {
+    const days = period === '7d' ? 7 : 30
+    const now = new Date()
+    const start = new Date(now)
+    start.setDate(start.getDate() - (days - 1))
+    start.setHours(0, 0, 0, 0)
+    return {
+      startDate: start.toISOString(),
+      endDate: now.toISOString(),
+      page: 1,
+      limit: 5,
+    }
+  }
+
+  return {
+    month: monthFromPeriod(period),
+    page: 1,
+    limit: 5,
+  }
+}
 
 export default function DashboardPage() {
-  const [activePeriod, setActivePeriod] = useState('Este Mes')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const periodParam = searchParams.get('period')
+  const activePeriod: PeriodKey = periodParam === '7d' || periodParam === '30d' || periodParam === 'previous' || periodParam === 'month' ? periodParam : 'month'
+
+  const transactionsFilters = useMemo(() => transactionFiltersFromPeriod(activePeriod), [activePeriod])
+
+  const summaryQuery = useSummary({ period: activePeriod })
+  const monthlyQuery = useMonthlySummary()
+  const categoryQuery = useCategorySummary({ period: activePeriod })
+  const latestTransactionsQuery = useTransactions(transactionsFilters)
+
+  const summary = summaryQuery.data
+  const latestTransactions = latestTransactionsQuery.data?.data ?? []
+  const handlePeriodChange = (period: PeriodKey) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('period', period)
+    setSearchParams(next, { replace: true })
+  }
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="mb-2 text-2xl font-bold text-foreground">Resumo Financeiro</h1>
-        <p className="text-sm text-secondary">Bem-vindo de volta</p>
-      </div>
-
-      <div className="mb-6 flex space-x-2">
-        {periods.map((period) => (
-          <Button
-            key={period}
-            variant={activePeriod === period ? 'default' : 'outline'}
-            onClick={() => setActivePeriod(period)}
-            className={activePeriod === period ? 'bg-primary text-white' : 'border-border text-secondary'}
-          >
-            {period}
-          </Button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-foreground">Evolucao do Saldo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-[260px] items-center justify-center rounded-md border border-dashed border-border text-secondary">
-              Chart placeholder
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-foreground">Gastos por Categoria</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-[260px] items-center justify-center rounded-md border border-dashed border-border text-secondary">
-              Donut placeholder
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardHeader />
+      <DashboardPeriodTabs activePeriod={activePeriod} onChange={handlePeriodChange} />
+      <DashboardKpiSection isLoading={summaryQuery.isLoading} isError={summaryQuery.isError} summary={summary} onRetry={summaryQuery.refetch} />
+      <DashboardChartsSection
+        monthly={{ isLoading: monthlyQuery.isLoading, isError: monthlyQuery.isError, data: monthlyQuery.data, refetch: monthlyQuery.refetch }}
+        category={{ isLoading: categoryQuery.isLoading, isError: categoryQuery.isError, data: categoryQuery.data, refetch: categoryQuery.refetch }}
+      />
+      <DashboardLatestTransactionsCard
+        isLoading={latestTransactionsQuery.isLoading}
+        isError={latestTransactionsQuery.isError}
+        transactions={latestTransactions}
+        onRetry={latestTransactionsQuery.refetch}
+      />
     </div>
   )
 }

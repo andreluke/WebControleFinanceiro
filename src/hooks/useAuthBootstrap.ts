@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { AuthService } from '@/services/auth'
+import { preloadAuthenticatedChunks } from '@/routing/lazyPages'
 import { useAuthStore } from '@/store/authStore'
 
 export function useAuthBootstrap() {
@@ -23,6 +24,7 @@ export function useAuthBootstrap() {
           setUser(response.user)
           setBootstrapping(false)
         }
+        void preloadAuthenticatedChunks()
       } catch {
         if (isMounted) {
           logout()

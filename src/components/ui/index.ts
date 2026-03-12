@@ -1,4 +1,5 @@
-export { Button, buttonVariants } from './Button'
+export { Button } from './Button'
+export { buttonVariants } from './button-variants'
 export { Input } from './Input'
 export { Label } from './Label'
 export { Checkbox } from './Checkbox'
@@ -33,3 +34,16 @@ export {
   DropdownMenuTrigger,
 } from './DropdownMenu'
 export { Toaster } from './Toaster'
+export { Skeleton } from './Skeleton'
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from './Dialog'

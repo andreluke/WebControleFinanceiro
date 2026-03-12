@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button, Checkbox, Input, Label, Toaster } from '@/components/ui'
 import { useToast } from '@/hooks/use-toast'
+import { preloadAuthenticatedChunks } from '@/routing/lazyPages'
 import { AuthService } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
+import { getErrorMessage } from '@/utils/apiError'
 
 export default function SignupPage() {
   const navigate = useNavigate()
@@ -51,10 +53,11 @@ export default function SignupPage() {
         password: formData.password,
       })
       login(response.token, response.user)
+      void preloadAuthenticatedChunks()
       toast({ title: 'Account created!', description: 'Welcome to FinanceApp.' })
       navigate('/dashboard')
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Signup failed'
+      const message = getErrorMessage(error, 'Signup failed')
       toast({ title: 'Signup failed', description: message, variant: 'destructive' })
     } finally {
       setLoading(false)

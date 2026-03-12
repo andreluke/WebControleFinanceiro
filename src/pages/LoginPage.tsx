@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { Button, Checkbox, Input, Label, Toaster } from '@/components/ui'
 import { useToast } from '@/hooks/use-toast'
+import { preloadAuthenticatedChunks } from '@/routing/lazyPages'
 import { AuthService } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
+import { getErrorMessage } from '@/utils/apiError'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -23,10 +25,11 @@ export default function LoginPage() {
     try {
       const response = await AuthService.login({ email, password })
       login(response.token, response.user)
+      void preloadAuthenticatedChunks()
       toast({ title: 'Welcome back!', description: 'You have successfully logged in.' })
       navigate('/dashboard')
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed'
+      const message = getErrorMessage(error, 'Login failed')
       toast({ title: 'Login failed', description: message, variant: 'destructive' })
     } finally {
       setLoading(false)
