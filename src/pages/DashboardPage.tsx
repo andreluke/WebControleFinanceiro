@@ -4,6 +4,7 @@ import { DashboardChartsSection } from '@/components/dashboard/DashboardChartsSe
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardKpiSection } from '@/components/dashboard/DashboardKpiSection'
 import { DashboardLatestTransactionsCard } from '@/components/dashboard/DashboardLatestTransactionsCard'
+import { SeedExportPanel } from '@/components/dashboard/SeedExportPanel'
 import { DashboardPeriodTabs, type PeriodKey } from '@/components/dashboard/DashboardPeriodTabs'
 import { useCategorySummary } from '@/hooks/useCategorySummary'
 import { useMonthlySummary } from '@/hooks/useMonthlySummary'
@@ -78,6 +79,7 @@ export default function DashboardPage() {
         transactions={latestTransactions}
         onRetry={latestTransactionsQuery.refetch}
       />
+      <SeedExportPanel />
     </div>
   )
 }

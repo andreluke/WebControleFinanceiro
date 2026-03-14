@@ -47,12 +47,13 @@ export default function LoginPage() {
       const response = await AuthService.login({
         email: data.email,
         password: data.password,
+        rememberMe: data.rememberMe,
       });
       login(response.token, response.user);
       void preloadAuthenticatedChunks();
       toast({
         title: "Bem-vindo de volta!",
-        description: "Login realizado com sucesso.",
+        description: data.rememberMe ? "Login realizado com sucesso. Você permanecerá conectado por 30 dias." : "Login realizado com sucesso.",
       });
       navigate("/dashboard");
     } catch (error) {

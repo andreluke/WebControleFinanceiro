@@ -12,6 +12,10 @@ export const AuthService = {
     return response.data
   },
 
+  logout: async () => {
+    await api.post('/auth/logout')
+  },
+
   me: async () => {
     const response = await api.get<{ user: User }>('/auth/me')
     return response.data

@@ -4,29 +4,46 @@
 
 @layer base {
   :root {
-    --background: 217 30% 7%;
-    --foreground: 0 0% 100%;
-    --sidebar: 223 26% 13%;
-    --card: 224 33% 16%;
-    --card-foreground: 0 0% 100%;
-    --primary: 217 85% 54%;
+    /* Design System - FinanceApp */
+    
+    /* Backgrounds */
+    --background: 231 30% 5%;      /* #0F1117 */
+    --sidebar: 223 26% 10%;         /* #161B27 */
+    --card: 224 26% 14%;            /* #1A2035 */
+    
+    /* Text */
+    --foreground: 0 0% 100%;        /* #FFFFFF */
+    --secondary: 220 11% 53%;        /* #8892A4 */
+    --muted: 220 11% 53%;           /* #8892A4 */
+    --muted-foreground: 220 11% 53%;
+    
+    /* Primary */
+    --primary: 217 91% 53%;         /* #2563EB */
     --primary-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
-    --danger: 0 84% 60%;
-    --warning: 38 92% 50%;
-    --secondary: 220 15% 57%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 220 25% 24%;
-    --muted-foreground: 220 14% 68%;
-    --accent: 217 85% 54%;
+    --primary-hover: 217 70% 60%;    /* #3B82F6 */
+    
+    /* Semantic */
+    --success: 142 71% 45%;         /* #22C55E */
+    --danger: 0 84% 60%;             /* #EF4444 */
+    --warning: 38 92% 50%;           /* #F59E0B */
+    
+    /* UI Elements */
+    --secondary: 220 15% 35%;        /* #1E2A40 */
+    --secondary-foreground: 220 11% 53%;
+    --muted: 220 25% 15%;           /* #1A2035 */
+    --accent: 217 91% 53%;           /* #2563EB */
     --accent-foreground: 0 0% 100%;
-    --popover: 224 33% 16%;
+    --popover: 224 26% 14%;         /* #1A2035 */
     --popover-foreground: 0 0% 100%;
-    --border: 220 29% 18%;
-    --input: 220 29% 25%;
-    --ring: 217 85% 54%;
+    --border: 220 29% 16%;          /* #1E2A40 */
+    --input: 220 22% 19%;           /* #1A2035 */
+    --ring: 217 91% 53%;
+    
+    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
+    
+    /* Radius */
     --radius: 0.75rem;
   }
 
@@ -49,19 +66,58 @@
 }
 
 @layer utilities {
-  .spacing-xs {
-    @apply p-1;
+  /* Custom colors for specific use cases */
+  .bg-app-background {
+    background-color: #0F1117;
   }
-  .spacing-sm {
-    @apply p-2;
+  
+  .bg-app-sidebar {
+    background-color: #161B27;
   }
-  .spacing-md {
-    @apply p-4;
+  
+  .bg-app-card {
+    background-color: #1A2035;
   }
-  .spacing-lg {
-    @apply p-6;
+  
+  .text-app-secondary {
+    color: #8892A4;
   }
-  .spacing-xl {
-    @apply p-8;
+  
+  .text-success {
+    color: #22C55E;
+  }
+  
+  .text-danger {
+    color: #EF4444;
+  }
+  
+  .text-warning {
+    color: #F59E0B;
+  }
+  
+  .bg-success\/20 {
+    background-color: rgba(34, 197, 94, 0.2);
+  }
+  
+  .bg-danger\/20 {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  
+  .bg-warning\/20 {
+    background-color: rgba(245, 158, 11, 0.2);
+  }
+  
+  /* Border colors */
+  .border-app-border {
+    border-color: #1E2A40;
+  }
+  
+  .border-app-border-light {
+    border-color: #2A3550;
+  }
+  
+  /* Input background */
+  .bg-app-input {
+    background-color: #1A2035;
   }
 }

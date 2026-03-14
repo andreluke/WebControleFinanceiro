@@ -37,15 +37,30 @@ function isCacheableGetRequest(config: InternalAxiosRequestConfig) {
   return method === 'get' && cacheHeader !== '1'
 }
 
+function getTokenFromCookie(): string | null {
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === 'token') {
+      return value
+    }
+  }
+  return null
+}
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token
+  const tokenFromStore = useAuthStore.getState().token
+  const tokenFromCookie = getTokenFromCookie()
+  const token = tokenFromCookie ?? tokenFromStore
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
