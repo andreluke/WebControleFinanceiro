@@ -2,7 +2,7 @@ import type { RecurringTransaction } from '@/types/recurring'
 import { useToast } from '@/hooks/use-toast'
 import { useDeleteRecurringTransaction, useToggleRecurringTransaction, useProcessRecurringTransaction } from '@/hooks/useRecurringTransactions'
 
-interface UseRecurringActionsReturn {
+export interface UseRecurringActionsReturn {
   toggle: (recurring: RecurringTransaction) => Promise<void>
   process: (recurring: RecurringTransaction) => Promise<void>
   remove: (recurring: RecurringTransaction) => Promise<void>

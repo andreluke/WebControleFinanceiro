@@ -1,0 +1,32 @@
+<svg width="128" height="128" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fundo -->
+  <rect
+    x="2"
+    y="2"
+    width="60"
+    height="60"
+    rx="18"
+    fill="url(#blueGradient)"
+  />
+
+  <!-- Letra -->
+  <text
+    x="50%"
+    y="52%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="34"
+    font-weight="700"
+    fill="white"
+  >
+    F
+  </text>
+</svg>

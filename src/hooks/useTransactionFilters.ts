@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
-import type { Transaction, TransactionType } from '@/types/transaction'
+import type { TransactionType } from '@/types/transaction'
 
 export type TypeFilter = TransactionType | 'all'
 export type MonthFilter = 'all' | 'current' | 'previous' | 'two_months_ago'
