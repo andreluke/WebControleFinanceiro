@@ -34,7 +34,13 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
   const createBudget = useCreateBudget()
   const updateBudget = useUpdateBudget()
   const deleteBudget = useDeleteBudget()
-  const [showTree, setShowTree] = useState(true)
+
+  const [showTree, setShowTree] = useState(() => {
+    if (budget?.subcategoryId) {
+      return false
+    }
+    return true
+  })
 
   const form = useForm({
     resolver: zodResolver(budgetSchema),
@@ -59,10 +65,8 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
     if (isOpen) {
       if (budget) {
         form.reset({ categoryId: budget.categoryId, subcategoryId: budget.subcategoryId || '', amount: budget.amount, month: budget.month, year: budget.year })
-        setShowTree(true)
       } else {
         form.reset({ categoryId: '', subcategoryId: '', amount: 0, month, year })
-        setShowTree(true)
       }
     }
   }, [isOpen, budget, month, year, form])
@@ -99,7 +103,6 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
         month: values.month,
         year: values.year,
       }
-      console.log('Payload:', payload)
       if (budget) {
         await updateBudget.mutateAsync({ id: budget.id, body: { amount: values.amount } })
         toast({ title: 'Orçamento atualizado', description: 'O orçamento foi atualizado com sucesso.' })
@@ -150,12 +153,12 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
                       <SelectValue placeholder="Selecione uma categoria">
                         {selectedSubcategory ? (
                           <div className="flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: selectedSubcategory.color }} />
+                            <span className="rounded-full w-2 h-2" style={{ backgroundColor: selectedSubcategory.color }} />
                             {selectedSubcategory.name}
                           </div>
                         ) : selectedCategory ? (
                           <div className="flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: selectedCategory.color }} />
+                            <span className="rounded-full w-2 h-2" style={{ backgroundColor: selectedCategory.color }} />
                             {selectedCategory.name}
                           </div>
                         ) : undefined}
@@ -166,7 +169,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
                         <SelectGroup>
                           <SelectItem value={selectedSubcategoryId || ''}>
                             <div className="flex items-center gap-2">
-                              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: selectedSubcategory.color }} />
+                              <span className="rounded-full w-2.5 h-2.5" style={{ backgroundColor: selectedSubcategory.color }} />
                               {selectedSubcategory.name}
                             </div>
                           </SelectItem>
@@ -187,7 +190,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
                           <SelectGroup key={cat.id}>
                             <SelectItem value={cat.id}>
                               <div className="flex items-center gap-2">
-                                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                                <span className="rounded-full w-2.5 h-2.5" style={{ backgroundColor: cat.color }} />
                                 {cat.name}
                               </div>
                             </SelectItem>
@@ -195,7 +198,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
                               <SelectItem key={sub.id} value={sub.id}>
                                 <div className="flex items-center gap-2 pl-4">
                                   <span className="text-secondary">└─</span>
-                                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: sub.color }} />
+                                  <span className="rounded-full w-2 h-2" style={{ backgroundColor: sub.color }} />
                                   {sub.name}
                                 </div>
                               </SelectItem>
@@ -208,12 +211,12 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
                 )}
               />
               {selectedSubcategoryId && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Orçamentos de subcategoria servem como medidor e não são somados ao total.
                 </p>
               )}
               {form.formState.errors.categoryId && (
-                <p className="text-xs text-danger">{form.formState.errors.categoryId.message}</p>
+                <p className="text-danger text-xs">{form.formState.errors.categoryId.message}</p>
               )}
             </div>
           </>
@@ -230,7 +233,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
             {...form.register('amount', { valueAsNumber: true })}
           />
           {form.formState.errors.amount && (
-            <p className="text-xs text-danger">{form.formState.errors.amount.message}</p>
+            <p className="text-danger text-xs">{form.formState.errors.amount.message}</p>
           )}
         </div>
 
@@ -246,7 +249,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Salvando...
               </>
             ) : isEditing ? (
