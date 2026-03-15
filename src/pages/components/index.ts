@@ -1,6 +1,7 @@
 export { TransactionModal } from './TransactionModal'
 export { CategoryModal } from './CategoryModal'
 export { PaymentMethodModal } from './PaymentMethodModal'
+export { SubcategoryModal } from './SubcategoryModal'
 export { TransfersModals } from './TransfersModals'
 export { RecurringModal } from './RecurringModal'
 export { RecurringList } from './RecurringList'

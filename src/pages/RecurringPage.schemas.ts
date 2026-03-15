@@ -13,6 +13,7 @@ export const recurringSchema = z.object({
   startDate: z.string().min(1, 'Informe a data inicial'),
   endDate: z.string().optional(),
   categoryId: z.string().optional(),
+  subcategoryId: z.string().optional(),
   paymentMethodId: z.string().optional(),
 }).refine(
   (data) => {

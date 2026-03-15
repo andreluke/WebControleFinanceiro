@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui'
 import { useCreateTransaction, useUpdateTransaction } from '@/hooks/useTransactions'
+import { useSubcategories } from '@/hooks/useSubcategories'
 import { useToast } from '@/hooks/use-toast'
 
 interface TransactionModalProps {
@@ -35,6 +36,7 @@ interface TransactionModalProps {
   initialCategoryId?: string
   initialPaymentMethodId?: string
   onOpenCategoryModal?: () => void
+  onOpenSubcategoryModal?: () => void
   onOpenPaymentMethodModal?: () => void
   onSuccess?: () => void
 }
@@ -46,6 +48,7 @@ const defaultValues: TransactionFormData = {
   type: 'expense',
   date: format(new Date(), 'yyyy-MM-dd'),
   categoryId: 'none',
+  subcategoryId: 'none',
   paymentMethodId: 'none',
 }
 
@@ -79,6 +82,7 @@ export function TransactionModal({
   initialCategoryId,
   initialPaymentMethodId,
   onOpenCategoryModal,
+  onOpenSubcategoryModal,
   onOpenPaymentMethodModal,
 }: TransactionModalProps) {
   const { toast } = useToast()
@@ -93,8 +97,15 @@ export function TransactionModal({
 
   const selectedType = useWatch({ control: form.control, name: 'type' })
   const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' })
+  const selectedSubcategoryId = useWatch({ control: form.control, name: 'subcategoryId' })
   const selectedPaymentMethodId = useWatch({ control: form.control, name: 'paymentMethodId' })
   const { ref: dateFieldRef, ...dateField } = form.register('date')
+
+  const { data: allSubcategories = [] } = useSubcategories()
+
+  const subcategories = selectedCategoryId && selectedCategoryId !== 'none'
+    ? allSubcategories.filter((s: { categoryId: string }) => s.categoryId === selectedCategoryId)
+    : []
 
   const isEditing = !!transaction
   const isLoading = createTransaction.isPending || updateTransaction.isPending
@@ -109,12 +120,14 @@ export function TransactionModal({
           type: transaction.type,
           date: toInputDate(transaction.date),
           categoryId: transaction.categoryId ?? 'none',
+          subcategoryId: transaction.subcategoryId ?? 'none',
           paymentMethodId: transaction.paymentMethodId ?? 'none',
         })
       } else {
         form.reset({
           ...defaultValues,
           categoryId: initialCategoryId ?? 'none',
+          subcategoryId: 'none',
           paymentMethodId: initialPaymentMethodId ?? 'none',
         })
       }
@@ -139,6 +152,7 @@ export function TransactionModal({
       type: values.type,
       date: toApiDate(values.date),
       categoryId: values.categoryId && values.categoryId !== 'none' ? values.categoryId : undefined,
+      subcategoryId: values.subcategoryId && values.subcategoryId !== 'none' ? values.subcategoryId : undefined,
       paymentMethodId: values.paymentMethodId && values.paymentMethodId !== 'none' ? values.paymentMethodId : undefined,
     }
 
@@ -259,7 +273,7 @@ export function TransactionModal({
                 Nova
               </Button>
             </div>
-            <Select value={selectedCategoryId || 'none'} onValueChange={(value) => form.setValue('categoryId', value)}>
+            <Select value={selectedCategoryId || 'none'} onValueChange={(value) => { form.setValue('categoryId', value); form.setValue('subcategoryId', 'none'); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
@@ -273,6 +287,30 @@ export function TransactionModal({
               </SelectContent>
             </Select>
           </div>
+
+          {selectedCategoryId && selectedCategoryId !== 'none' && (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label>Subcategoria</Label>
+                <Button type="button" variant="ghost" size="sm" className="px-2 h-7 text-primary" onClick={onOpenSubcategoryModal}>
+                  Nova
+                </Button>
+              </div>
+              <Select value={selectedSubcategoryId || 'none'} onValueChange={(value) => form.setValue('subcategoryId', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem subcategoria</SelectItem>
+                  {subcategories.map((sub: { id: string; name: string }) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

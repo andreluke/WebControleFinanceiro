@@ -33,6 +33,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays } from "lucide-react";
 import { useRef } from "react";
+import { useSubcategories } from "@/hooks/useSubcategories";
+import { useCategories } from "@/hooks/useCategories";
 
 interface RecurringModalProps {
   isOpen: boolean;
@@ -51,6 +53,7 @@ const defaultValues: RecurringFormData = {
   startDate: format(new Date(), "yyyy-MM-dd"),
   endDate: "",
   categoryId: "",
+  subcategoryId: "",
   paymentMethodId: "",
 };
 
@@ -98,6 +101,14 @@ export function RecurringModal({
     control: form.control,
     name: "dayOfWeek",
   });
+  const selectedCategoryId = useWatch({ control: form.control, name: "categoryId" });
+
+  const { data: allSubcategories = [] } = useSubcategories();
+  const { data: categories = [] } = useCategories();
+
+  const subcategories = selectedCategoryId && selectedCategoryId !== "none"
+    ? allSubcategories.filter((s: { categoryId: string }) => s.categoryId === selectedCategoryId)
+    : [];
 
   const isEditing = !!recurring;
   const isLoading = createRecurring.isPending || updateRecurring.isPending;
@@ -117,6 +128,7 @@ export function RecurringModal({
           startDate: toInputDate(recurring.startDate),
           endDate: recurring.endDate ? toApiDate(recurring.endDate) : "",
           categoryId: recurring.categoryId ?? "",
+          subcategoryId: recurring.subcategoryId ?? "",
           paymentMethodId: recurring.paymentMethodId ?? "",
         });
       } else {
@@ -141,6 +153,10 @@ export function RecurringModal({
       categoryId:
         values.categoryId && values.categoryId !== "none"
           ? values.categoryId
+          : undefined,
+      subcategoryId:
+        values.subcategoryId && values.subcategoryId !== "none"
+          ? values.subcategoryId
           : undefined,
       paymentMethodId:
         values.paymentMethodId && values.paymentMethodId !== "none"
@@ -417,6 +433,53 @@ export function RecurringModal({
               </button>
             </div>
           </div>
+        </div>
+
+        <div className="gap-4 grid grid-cols-2">
+          <div className="space-y-2">
+            <Label>Categoria</Label>
+            <Select
+              value={selectedCategoryId || "none"}
+              onValueChange={(value) => {
+                form.setValue("categoryId", value);
+                form.setValue("subcategoryId", "none");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem categoria</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedCategoryId && selectedCategoryId !== "none" && (
+            <div className="space-y-2">
+              <Label>Subcategoria</Label>
+              <Select
+                value={form.getValues("subcategoryId") || "none"}
+                onValueChange={(value) => form.setValue("subcategoryId", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem subcategoria</SelectItem>
+                  {subcategories.map((sub) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         <DialogFooter>

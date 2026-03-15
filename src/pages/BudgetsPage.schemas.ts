@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 export const budgetSchema = z.object({
-  categoryId: z.string().uuid('Categoria inválida'),
+  categoryId: z.string().min(1, 'Categoria é obrigatória'),
+  subcategoryId: z.string().optional(),
   amount: z.number({ invalid_type_error: 'Valor deve ser um número' }).positive('Valor deve ser positivo'),
   month: z.number().int().min(1).max(12),
   year: z.number().int().min(2020).max(2100),

@@ -85,6 +85,7 @@ export default function TransfersPage() {
           onCreateClick={modals.openCreate}
           onCategoryClick={() => modals.setCategoryModal(true)}
           onPaymentMethodClick={() => modals.setPaymentModal(true)}
+          onSubcategoryClick={() => modals.setSubcategoryModal(true)}
         />
 
         <CardFilters
@@ -126,20 +127,27 @@ export default function TransfersPage() {
       <TransfersModals
         transactionOpen={modals.transactionModal}
         categoryOpen={modals.categoryModal}
+        subcategoryOpen={modals.subcategoryModal}
         paymentOpen={modals.paymentModal}
         transaction={modals.editingTransaction}
         categories={categories}
         paymentMethods={paymentMethods}
+        selectedCategoryId={modals.selectedCategoryId}
         initialCategoryId={modals.initialCategoryId}
         initialPaymentMethodId={modals.initialPaymentMethodId}
         onCloseTransaction={modals.closeTransaction}
         onCloseCategory={() => modals.setCategoryModal(false)}
+        onCloseSubcategory={() => modals.setSubcategoryModal(false)}
         onClosePayment={() => modals.setPaymentModal(false)}
         onCategorySelect={modals.openCategorySelect}
         onPaymentMethodSelect={modals.openPaymentMethodSelect}
         onOpenCategory={() => {
           modals.closeTransaction()
           modals.setCategoryModal(true)
+        }}
+        onOpenSubcategory={() => {
+          modals.closeTransaction()
+          modals.setSubcategoryModal(true)
         }}
         onOpenPayment={() => {
           modals.closeTransaction()
@@ -152,10 +160,11 @@ export default function TransfersPage() {
   )
 }
 
-function Header({ onCreateClick, onCategoryClick, onPaymentMethodClick }: {
+function Header({ onCreateClick, onCategoryClick, onPaymentMethodClick, onSubcategoryClick }: {
   onCreateClick: () => void
   onCategoryClick: () => void
   onPaymentMethodClick: () => void
+  onSubcategoryClick: () => void
 }) {
   return (
     <div className="flex md:flex-row flex-col md:justify-between md:items-start gap-4 mb-8">
@@ -165,6 +174,7 @@ function Header({ onCreateClick, onCategoryClick, onPaymentMethodClick }: {
       </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={onCategoryClick}>+ Categoria</Button>
+        <Button variant="outline" onClick={onSubcategoryClick}>+ Subcategoria</Button>
         <Button variant="outline" onClick={onPaymentMethodClick}>+ Metodo</Button>
         <Button className="bg-primary hover:bg-primary/90 shadow-cta text-white" onClick={onCreateClick}>
           <Plus className="w-4 h-4" />
@@ -277,17 +287,28 @@ function TransactionTable({ transactions, onEdit, onDelete }: {
                 {transaction.subDescription && <p className="text-secondary text-xs">{transaction.subDescription}</p>}
               </td>
               <td className="px-3 py-4">
-                {transaction.category ? (
-                  <span
-                    className="inline-flex items-center gap-2 px-2 py-1 rounded-md font-medium text-xs"
-                    style={{ backgroundColor: `${transaction.category.color}22`, color: transaction.category.color }}
-                  >
-                    <span className="rounded-full w-2 h-2" style={{ backgroundColor: transaction.category.color }} />
-                    {transaction.category.name}
-                  </span>
-                ) : (
-                  <span className="text-secondary">-</span>
-                )}
+                <div className="flex flex-wrap gap-2">
+                  {transaction.category ? (
+                    <span
+                      className="inline-flex items-center gap-2 px-2 py-1 rounded-md font-medium text-xs"
+                      style={{ backgroundColor: `${transaction.category.color}22`, color: transaction.category.color }}
+                    >
+                      <span className="rounded-full w-2 h-2" style={{ backgroundColor: transaction.category.color }} />
+                      {transaction.category.name}
+                    </span>
+                  ) : (
+                    <span className="text-secondary">-</span>
+                  )}
+                  {transaction.subcategory && (
+                    <span
+                      className="inline-flex items-center gap-2 px-2 py-1 rounded-md font-medium text-xs"
+                      style={{ backgroundColor: `${transaction.subcategory.color}22`, color: transaction.subcategory.color }}
+                    >
+                      <span className="rounded-full w-2 h-2" style={{ backgroundColor: transaction.subcategory.color }} />
+                      {transaction.subcategory.name}
+                    </span>
+                  )}
+                </div>
               </td>
               <td className="px-3 py-4 text-secondary">{transaction.paymentMethod?.name ?? '-'}</td>
               <td className={`px-3 py-4 font-semibold ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>

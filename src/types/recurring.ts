@@ -1,4 +1,4 @@
-import type { TransactionCategory, TransactionPaymentMethod, TransactionType } from './transaction'
+import type { TransactionCategory, TransactionPaymentMethod, TransactionType, TransactionSubcategory } from './transaction'
 
 export type TransactionTypeR = TransactionType
 
@@ -12,6 +12,8 @@ export interface RecurringTransaction {
   type: TransactionType
   categoryId?: string | null
   category?: TransactionCategory | null
+  subcategoryId?: string | null
+  subcategory?: TransactionSubcategory | null
   paymentMethodId?: string | null
   paymentMethod?: TransactionPaymentMethod | null
   frequency: FrequencyType
@@ -36,6 +38,7 @@ export interface CreateRecurringTransactionInput {
   amount: number
   type: TransactionType
   categoryId?: string
+  subcategoryId?: string
   paymentMethodId?: string
   frequency: FrequencyType
   customIntervalDays?: number

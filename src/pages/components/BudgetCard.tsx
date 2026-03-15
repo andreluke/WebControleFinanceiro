@@ -28,9 +28,16 @@ export function BudgetCard({ budget, onEdit }: BudgetCardProps) {
   return (
     <div className="group relative rounded-lg border border-border bg-card p-4 transition-all hover:shadow-md">
       <div className="mb-3 flex items-start justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="h-3 w-3 rounded-full" style={{ backgroundColor: budget.categoryColor }} />
           <span className="font-medium text-foreground">{budget.categoryName}</span>
+          {budget.subcategoryName && (
+            <>
+              <span className="text-secondary">/</span>
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: budget.subcategoryColor || '#6B7280' }} />
+              <span className="font-medium text-foreground">{budget.subcategoryName}</span>
+            </>
+          )}
         </div>
         {isOverBudget && (
           <div className="flex items-center gap-1 text-danger">

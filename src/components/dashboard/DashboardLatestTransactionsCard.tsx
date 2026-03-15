@@ -71,7 +71,30 @@ export function DashboardLatestTransactionsCard({ isLoading, isError, transactio
                   <tr key={transaction.id} className="border-b border-border/60 last:border-b-0">
                     <td className="px-3 py-3 text-secondary">{formatDate(transaction.date)}</td>
                     <td className="px-3 py-3 text-foreground">{transaction.description}</td>
-                    <td className="px-3 py-3 text-secondary">{transaction.category?.name ?? '-'}</td>
+                    <td className="px-3 py-3">
+                      {transaction.category ? (
+                        <div className="flex flex-wrap gap-1">
+                          <span
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
+                            style={{ backgroundColor: `${transaction.category.color}22`, color: transaction.category.color }}
+                          >
+                            <span className="rounded-full w-1.5 h-1.5" style={{ backgroundColor: transaction.category.color }} />
+                            {transaction.category.name}
+                          </span>
+                          {transaction.subcategory && (
+                            <span
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
+                              style={{ backgroundColor: `${transaction.subcategory.color}22`, color: transaction.subcategory.color }}
+                            >
+                              <span className="rounded-full w-1.5 h-1.5" style={{ backgroundColor: transaction.subcategory.color }} />
+                              {transaction.subcategory.name}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-secondary">-</span>
+                      )}
+                    </td>
                     <td className="px-3 py-3 text-secondary">{transaction.paymentMethod?.name ?? '-'}</td>
                     <td className={`px-3 py-3 font-semibold ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
                       {transaction.type === 'income' ? '+' : '-'} {formatBRL(transaction.amount)}

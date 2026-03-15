@@ -9,7 +9,8 @@ export function useFilteredTransactions(transactions: Transaction[], query: stri
     return transactions.filter((t) =>
       t.description.toLowerCase().includes(q) ||
       t.subDescription?.toLowerCase().includes(q) ||
-      t.category?.name.toLowerCase().includes(q)
+      t.category?.name.toLowerCase().includes(q) ||
+      t.subcategory?.name.toLowerCase().includes(q)
     )
   }, [transactions, query])
 }
