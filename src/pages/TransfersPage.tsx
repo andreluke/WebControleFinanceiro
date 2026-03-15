@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { format, subMonths } from 'date-fns'
-import { Edit, Loader2, Plus, Search, Trash2 } from 'lucide-react'
+import { Edit, Loader2, Plus, Search, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Transaction, TransactionType } from '@/types/transaction'
 import { formatBRL } from '@/utils/currency'
 import { formatDate } from '@/utils/date'
@@ -20,10 +20,12 @@ const monthFilterOptions = [
   { value: 'current', label: 'Este mes' },
   { value: 'previous', label: 'Mes passado' },
   { value: 'two_months_ago', label: '2 meses atras' },
+  { value: 'specific', label: 'Período Específico' },
 ] as const
 
-function monthParamFromFilter(filter: string) {
+function monthParamFromFilter(filter: string, specificMonth?: string) {
   if (filter === 'all') return undefined
+  if (filter === 'specific' && specificMonth) return specificMonth
   if (filter === 'current') return format(new Date(), 'yyyy-MM')
   if (filter === 'previous') return format(subMonths(new Date(), 1), 'yyyy-MM')
   return format(subMonths(new Date(), 2), 'yyyy-MM')
@@ -32,7 +34,7 @@ function monthParamFromFilter(filter: string) {
 export default function TransfersPage() {
   const { toast } = useToast()
 
-  const { filters, update } = useTransactionFilters()
+  const { filters, update, updatePeriod } = useTransactionFilters()
   const modals = useTransactionModals(filters.new)
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function TransfersPage() {
   const { data: transactionsResponse, isLoading, isError, error } = useTransactions({
     page: filters.page,
     limit: pageSize,
-    month: monthParamFromFilter(filters.period),
+    month: monthParamFromFilter(filters.period, filters.specificMonth),
     type: transactionType,
   })
 
@@ -92,9 +94,11 @@ export default function TransfersPage() {
           query={filters.query}
           type={filters.type}
           period={filters.period}
+          specificMonth={filters.specificMonth}
           onQueryChange={(q) => update({ q, page: 1 })}
           onTypeChange={(t) => update({ type: t, page: 1 })}
-          onPeriodChange={(p) => update({ period: p, page: 1 })}
+          onPeriodChange={(p) => updatePeriod(p, filters.specificMonth)}
+          onSpecificMonthChange={(m) => updatePeriod('specific', m)}
         />
 
         <Card className="bg-card border-border">
@@ -185,13 +189,15 @@ function Header({ onCreateClick, onCategoryClick, onPaymentMethodClick, onSubcat
   )
 }
 
-function CardFilters({ query, type, period, onQueryChange, onTypeChange, onPeriodChange }: {
+function CardFilters({ query, type, period, specificMonth, onQueryChange, onTypeChange, onPeriodChange, onSpecificMonthChange }: {
   query: string
   type: string
   period: string
+  specificMonth?: string
   onQueryChange: (q: string) => void
   onTypeChange: (t: string) => void
   onPeriodChange: (p: string) => void
+  onSpecificMonthChange: (m: string) => void
 }) {
   return (
     <Card className="bg-card mb-6 border-border">
@@ -229,6 +235,54 @@ function CardFilters({ query, type, period, onQueryChange, onTypeChange, onPerio
             </SelectContent>
           </Select>
         </div>
+        
+        {period === 'specific' && (
+          <div className="mt-4 flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                if (specificMonth) {
+                  const [year, month] = specificMonth.split('-')
+                  const current = new Date(parseInt(year), parseInt(month) - 1, 1)
+                  const prev = new Date(current)
+                  prev.setMonth(prev.getMonth() - 1)
+                  onSpecificMonthChange(format(prev, 'yyyy-MM'))
+                } else {
+                  onSpecificMonthChange(format(subMonths(new Date(), 1), 'yyyy-MM'))
+                }
+              }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Input
+              type="month"
+              value={specificMonth || ''}
+              onChange={(e) => onSpecificMonthChange(e.target.value)}
+              className="bg-background border-border text-foreground w-40"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                if (specificMonth) {
+                  const [year, month] = specificMonth.split('-')
+                  const current = new Date(parseInt(year), parseInt(month) - 1, 1)
+                  const next = new Date(current)
+                  next.setMonth(next.getMonth() + 1)
+                  const now = new Date()
+                  if (next <= now) {
+                    onSpecificMonthChange(format(next, 'yyyy-MM'))
+                  }
+                }
+              }}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
