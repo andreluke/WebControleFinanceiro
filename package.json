@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "serve -l tcp://0.0.0.0:8080 ./dist",
+    "start": "serve -s -l tcp://0.0.0.0:8080 ./dist",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
