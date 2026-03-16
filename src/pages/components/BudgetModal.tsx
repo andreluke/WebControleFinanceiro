@@ -94,7 +94,6 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
   }
 
   const onSubmit = form.handleSubmit(async (values) => {
-    console.log('Submitting budget:', values)
     try {
       const payload = {
         categoryId: values.categoryId,

@@ -15,4 +15,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     css: true,
   },
+  server: {
+    port: 8080,
+    host: '0.0.0.0'
+  }
 })
