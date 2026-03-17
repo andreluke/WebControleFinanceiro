@@ -12,7 +12,7 @@ export const SummaryService = {
     return response.data
   },
 
-  getByCategory: async (params?: { month?: string; period?: SummaryPeriod }) => {
+  getByCategory: async (params?: { month?: string; period?: SummaryPeriod; type?: 'income' | 'expense' }) => {
     const response = await api.get<CategorySummary[]>('/summary/by-category', { params })
     return response.data
   },
