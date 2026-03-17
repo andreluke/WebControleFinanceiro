@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ArrowLeftRight, Repeat, TrendingUp, CreditCard, Settings, Lock, LogOut, Target } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, Repeat, TrendingUp, CreditCard, Settings, Lock, LogOut, Target, PiggyBank } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { AuthService } from '@/services/auth'
 
@@ -7,7 +7,8 @@ const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, locked: false },
   { path: '/transfers', label: 'Transferencias', icon: ArrowLeftRight, locked: false },
   { path: '/recurring', label: 'Recorrentes', icon: Repeat, locked: false },
-  { path: '/budgets', label: 'Metas e Orçamentos', icon: Target, locked: false },
+  { path: '/goals', label: 'Metas', icon: PiggyBank, locked: false },
+  { path: '/budgets', label: 'Orçamentos', icon: Target, locked: false },
   { path: '/investments', label: 'Investimentos', icon: TrendingUp, locked: true },
   { path: '/cards', label: 'Cartoes', icon: CreditCard, locked: true },
   { path: '/settings', label: 'Configuracoes', icon: Settings, locked: true },

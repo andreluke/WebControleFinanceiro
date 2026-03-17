@@ -11,6 +11,19 @@ import { useCategories } from '@/hooks/useCategories'
 import { useSubcategories } from '@/hooks/useSubcategories'
 import { useToast } from '@/hooks/use-toast'
 
+function formatCurrencyMasked(value: number) {
+  return value.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+function parseCurrencyMasked(input: string) {
+  const digits = input.replace(/\D/g, '')
+  if (!digits) return 0
+  return Number(digits) / 100
+}
+
 interface BudgetModalProps {
   isOpen: boolean
   onClose: () => void
@@ -223,14 +236,27 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
 
         <div className="space-y-2">
           <Label htmlFor="amount">Valor do orçamento</Label>
-          <Input
-            id="amount"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0,00"
-            {...form.register('amount', { valueAsNumber: true })}
-          />
+          <div className="relative">
+            <span className="top-1/2 left-3 absolute font-medium text-secondary text-sm -translate-y-1/2 pointer-events-none">R$</span>
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <Input
+                  id="amount"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0,00"
+                  className="pl-10"
+                  value={formatCurrencyMasked(Number(field.value) || 0)}
+                  onChange={(event) => field.onChange(parseCurrencyMasked(event.target.value))}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                />
+              )}
+            />
+          </div>
           {form.formState.errors.amount && (
             <p className="text-danger text-xs">{form.formState.errors.amount.message}</p>
           )}
