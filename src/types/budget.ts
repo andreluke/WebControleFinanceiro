@@ -1,6 +1,7 @@
 export interface Budget {
   id: string
   amount: number
+  baseAmount?: number | null
   month: number
   year: number
   categoryId: string
@@ -13,6 +14,10 @@ export interface Budget {
   percentage: number
   remaining: number
   isOverBudget: boolean
+  isRecurring?: boolean | null
+  isActive?: boolean | null
+  recurringGroupId?: string | null
+  subcategoriesTotal?: number | null
 }
 
 export interface BudgetSummary {
@@ -28,10 +33,15 @@ export interface CreateBudgetInput {
   categoryId: string
   subcategoryId?: string
   amount: number
+  baseAmount?: number
   month: number
   year: number
+  isRecurring?: boolean
 }
 
 export interface UpdateBudgetInput {
-  amount: number
+  amount?: number
+  baseAmount?: number
+  isActive?: boolean
+  isRecurring?: boolean
 }

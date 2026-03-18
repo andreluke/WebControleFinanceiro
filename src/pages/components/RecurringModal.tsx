@@ -388,14 +388,21 @@ export function RecurringModal({
             <Label htmlFor="startDate">Data inicial</Label>
 
             <div className="relative">
-              <Input
-                id="startDate"
-                type="date"
-                {...form.register("startDate")}
-                ref={(el) => {
-                  startDateRef.current = el;
-                }}
-                className="[&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 [&::-webkit-calendar-picker-indicator]:pointer-events-none [color-scheme:dark] [appearance:textfield]"
+              <Controller
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <Input
+                    id="startDate"
+                    type="date"
+                    {...field}
+                    ref={(el) => {
+                      startDateRef.current = el;
+                      field.ref(el);
+                    }}
+                    className="[&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 [&::-webkit-calendar-picker-indicator]:pointer-events-none [color-scheme:dark] [appearance:textfield]"
+                  />
+                )}
               />
 
               <button
@@ -413,14 +420,21 @@ export function RecurringModal({
             <Label htmlFor="endDate">Data final (opcional)</Label>
 
             <div className="relative">
-              <Input
-                id="endDate"
-                type="date"
-                {...form.register("endDate")}
-                ref={(el) => {
-                  endDateRef.current = el;
-                }}
-                className="[&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 [&::-webkit-calendar-picker-indicator]:pointer-events-none [color-scheme:dark] [appearance:textfield]"
+              <Controller
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <Input
+                    id="endDate"
+                    type="date"
+                    {...field}
+                    ref={(el) => {
+                      endDateRef.current = el;
+                      field.ref(el);
+                    }}
+                    className="[&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 [&::-webkit-calendar-picker-indicator]:pointer-events-none [color-scheme:dark] [appearance:textfield]"
+                  />
+                )}
               />
 
               <button

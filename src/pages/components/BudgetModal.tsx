@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, RefreshCw, Info } from 'lucide-react'
 import type { Category } from '@/types/category'
 import type { Budget, CreateBudgetInput } from '@/types/budget'
 import { budgetSchema } from '../BudgetsPage.schemas'
-import { Button, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Input, Label, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui'
+import { Button, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Input, Label, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, Switch } from '@/components/ui'
 import { useCreateBudget, useUpdateBudget, useDeleteBudget } from '@/hooks/useBudgets'
 import { useCategories } from '@/hooks/useCategories'
 import { useSubcategories } from '@/hooks/useSubcategories'
@@ -38,6 +38,7 @@ const defaultValues: CreateBudgetInput = {
   amount: 0,
   month: 1,
   year: 2026,
+  isRecurring: false,
 }
 
 export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModalProps) {
@@ -62,6 +63,7 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
 
   const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' })
   const selectedSubcategoryId = useWatch({ control: form.control, name: 'subcategoryId' })
+  const selectedIsRecurring = useWatch({ control: form.control, name: 'isRecurring' })
 
   const categoriesWithSubcategories = categories.map((cat: Category) => ({
     ...cat,
@@ -77,9 +79,17 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
   useEffect(() => {
     if (isOpen) {
       if (budget) {
-        form.reset({ categoryId: budget.categoryId, subcategoryId: budget.subcategoryId || '', amount: budget.amount, month: budget.month, year: budget.year })
+        form.reset({ 
+          categoryId: budget.categoryId, 
+          subcategoryId: budget.subcategoryId || '', 
+          amount: budget.amount, 
+          baseAmount: budget.baseAmount ?? budget.amount,
+          month: budget.month, 
+          year: budget.year,
+          isRecurring: budget.isRecurring === true,
+        })
       } else {
-        form.reset({ categoryId: '', subcategoryId: '', amount: 0, month, year })
+        form.reset({ categoryId: '', subcategoryId: '', amount: 0, baseAmount: 0, month, year, isRecurring: false })
       }
     }
   }, [isOpen, budget, month, year, form])
@@ -108,19 +118,41 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const payload = {
-        categoryId: values.categoryId,
-        subcategoryId: values.subcategoryId && values.subcategoryId !== '' ? values.subcategoryId : undefined,
-        amount: values.amount,
-        month: values.month,
-        year: values.year,
-      }
       if (budget) {
-        await updateBudget.mutateAsync({ id: budget.id, body: { amount: values.amount } })
-        toast({ title: 'Orçamento atualizado', description: 'O orçamento foi atualizado com sucesso.' })
+        const isParentWithSubcategories = !budget.subcategoryId && (budget.subcategoriesTotal ?? 0) > 0
+        
+        await updateBudget.mutateAsync({ 
+          id: budget.id, 
+          body: { 
+            baseAmount: isParentWithSubcategories ? values.baseAmount : undefined,
+            amount: isParentWithSubcategories ? undefined : values.amount,
+            isRecurring: values.isRecurring,
+          } 
+        })
+        toast({ 
+          title: 'Orçamento atualizado', 
+          description: values.isRecurring
+            ? 'Orçamento atualizado. As alterações serão aplicadas nos próximos meses.'
+            : 'O orçamento foi atualizado com sucesso.',
+        })
       } else {
+        const isSubcategory = values.subcategoryId && values.subcategoryId !== ''
+        const payload = {
+          categoryId: values.categoryId,
+          subcategoryId: isSubcategory ? values.subcategoryId : undefined,
+          amount: values.amount,
+          baseAmount: isSubcategory ? 0 : (values.baseAmount ?? values.amount),
+          month: values.month,
+          year: values.year,
+          isRecurring: values.isRecurring,
+        }
         await createBudget.mutateAsync(payload)
-        toast({ title: 'Orçamento criado', description: 'O orçamento foi criado com sucesso.' })
+        toast({ 
+          title: 'Orçamento criado', 
+          description: values.isRecurring 
+            ? 'O orçamento foi criado e será recriado automaticamente no próximo mês.'
+            : 'O orçamento foi criado com sucesso.',
+        })
       }
       form.reset(defaultValues)
       onClose()
@@ -145,13 +177,14 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
+    <DialogContent className="max-h-[85vh] flex flex-col overflow-hidden">
+      <DialogHeader className="shrink-0">
         <DialogTitle>{isEditing ? 'Editar orçamento' : 'Novo orçamento'}</DialogTitle>
         <DialogDescription>Defina um limite de gastos para uma categoria.</DialogDescription>
       </DialogHeader>
 
-      <form className="space-y-4" onSubmit={onSubmit}>
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <form className="space-y-4" onSubmit={onSubmit}>
         {!isEditing && (
           <>
             <div className="space-y-2">
@@ -235,34 +268,139 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="amount">Valor do orçamento</Label>
-          <div className="relative">
-            <span className="top-1/2 left-3 absolute font-medium text-secondary text-sm -translate-y-1/2 pointer-events-none">R$</span>
-            <Controller
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <Input
-                  id="amount"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0,00"
-                  className="pl-10"
-                  value={formatCurrencyMasked(Number(field.value) || 0)}
-                  onChange={(event) => field.onChange(parseCurrencyMasked(event.target.value))}
-                  onBlur={field.onBlur}
-                  name={field.name}
-                  ref={field.ref}
+          {isEditing && budget && !budget.subcategoryId && (budget.subcategoriesTotal ?? 0) > 0 ? (
+            <>
+              <Label htmlFor="baseAmount">Valor base</Label>
+              <div className="relative">
+                <span className="top-1/2 left-3 absolute font-medium text-secondary text-sm -translate-y-1/2 pointer-events-none">R$</span>
+                <Controller
+                  control={form.control}
+                  name="baseAmount"
+                  render={({ field }) => (
+                    <Input
+                      id="baseAmount"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0,00"
+                      className="pl-10"
+                      value={formatCurrencyMasked(Number(field.value) || 0)}
+                      onChange={(event) => field.onChange(parseCurrencyMasked(event.target.value))}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  )}
                 />
+              </div>
+              <p className="text-muted-foreground text-xs">
+                O valor total é R$ {formatCurrencyMasked(Number(form.getValues('baseAmount') || 0) + (budget.subcategoriesTotal ?? 0))} (base + subcategorias) e é calculado automaticamente.
+              </p>
+            </>
+          ) : (
+            <>
+              <Label htmlFor="amount">
+                {selectedSubcategoryId ? 'Valor do orçamento' : 'Valor total (base + subcategorias)'}
+              </Label>
+              <div className="relative">
+                <span className="top-1/2 left-3 absolute font-medium text-secondary text-sm -translate-y-1/2 pointer-events-none">R$</span>
+                <Controller
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <Input
+                      id="amount"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0,00"
+                      className="pl-10"
+                      value={formatCurrencyMasked(Number(field.value) || 0)}
+                      onChange={(event) => field.onChange(parseCurrencyMasked(event.target.value))}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  )}
+                />
+              </div>
+              {form.formState.errors.amount && (
+                <p className="text-danger text-xs">{form.formState.errors.amount.message}</p>
               )}
-            />
-          </div>
-          {form.formState.errors.amount && (
-            <p className="text-danger text-xs">{form.formState.errors.amount.message}</p>
+              {!selectedSubcategoryId && !isEditing && (
+                <p className="text-muted-foreground text-xs">
+                  Este valor é a soma do valor base + total das subcategorias.
+                </p>
+              )}
+            </>
           )}
         </div>
 
-        <DialogFooter>
+        {selectedSubcategoryId && (
+          <p className="text-muted-foreground text-xs -mt-2">
+            Orçamentos de subcategoria são somados ao orçamento da categoria pai.
+          </p>
+        )}
+
+        {isEditing && (
+          <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-card p-4">
+            <div className="flex items-start gap-3">
+              <Controller
+                control={form.control}
+                name="isRecurring"
+                render={({ field }) => (
+                  <Switch
+                    id="isRecurring"
+                    checked={field.value === true}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                  />
+                )}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="isRecurring" className="cursor-pointer font-medium">
+                  <div className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 text-secondary" />
+                    Orçamento Recorrente
+                  </div>
+                </Label>
+                <p className="text-xs text-secondary">
+                  {budget.isRecurring
+                    ? 'Edite o valor aqui para atualizar em todos os meses futuros.'
+                    : 'Ao ativar, este orçamento será automaticamente recriado no próximo mês.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isEditing && (
+          <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-card p-4">
+            <div className="flex items-start gap-3">
+              <Controller
+                control={form.control}
+                name="isRecurring"
+                render={({ field }) => (
+                  <Switch
+                    id="isRecurring"
+                    checked={field.value === true}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                  />
+                )}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="isRecurring" className="cursor-pointer font-medium">
+                  <div className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 text-secondary" />
+                    Orçamento Recorrente
+                  </div>
+                </Label>
+                <p className="text-xs text-secondary">
+                  Ao ativar, este orçamento será automaticamente recriado no início de cada mês.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="shrink-0">
           {isEditing && (
             <Button type="button" variant="destructive" onClick={handleDelete}>
               Excluir
@@ -284,7 +422,8 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
             )}
           </Button>
         </DialogFooter>
-      </form>
+        </form>
+      </div>
     </DialogContent>
   )
 }

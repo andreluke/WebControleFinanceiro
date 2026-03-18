@@ -38,3 +38,13 @@ export function useDeleteBudget() {
     },
   })
 }
+
+export function useToggleBudgetActive() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => BudgetsService.toggleActive(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] })
+    },
+  })
+}

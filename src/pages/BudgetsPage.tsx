@@ -28,6 +28,11 @@ export default function BudgetsPage() {
     setEditingBudget(null)
   }
 
+  const handleOpenCreate = () => {
+    setEditingBudget(null)
+    setIsModalOpen(true)
+  }
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -53,7 +58,7 @@ export default function BudgetsPage() {
   return (
     <>
       <div>
-        <Header onCreateClick={() => setIsModalOpen(true)} />
+        <Header onCreateClick={handleOpenCreate} />
 
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
           <select
@@ -122,7 +127,7 @@ export default function BudgetsPage() {
             ) : summary?.budgets.length === 0 ? (
               <div className="flex h-32 flex-col items-center justify-center gap-2">
                 <p className="text-secondary">Nenhum orçamento encontrado.</p>
-                <Button onClick={() => setIsModalOpen(true)}>
+                <Button onClick={handleOpenCreate}>
                   <Plus className="h-4 w-4" />
                   Criar orçamento
                 </Button>

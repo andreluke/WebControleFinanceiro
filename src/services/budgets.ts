@@ -22,6 +22,11 @@ export const BudgetsService = {
     return response.data
   },
 
+  toggleActive: async (id: string) => {
+    const response = await api.patch<Budget>(`/budgets/${id}/toggle`)
+    return response.data
+  },
+
   remove: async (id: string) => {
     await api.delete(`/budgets/${id}`)
   },

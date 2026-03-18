@@ -3,6 +3,7 @@ export { buttonVariants } from './button-variants'
 export { Input } from './Input'
 export { Label } from './Label'
 export { Checkbox } from './Checkbox'
+export { Switch } from './Switch'
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './Card'
 export {
   Select,

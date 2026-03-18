@@ -26,12 +26,14 @@ const DialogContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.C
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 shadow-lg duration-200',
+          'fixed left-1/2 top-[10%] z-50 grid w-full max-w-lg max-h-[85vh] -translate-x-1/2 gap-4 rounded-lg border border-border bg-card p-6 shadow-lg duration-200 overflow-hidden',
           className
         )}
         {...props}
       >
-        {children}
+        <div className="overflow-y-auto max-h-[calc(85vh-3rem)] scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+          {children}
+        </div>
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-secondary opacity-80 transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>

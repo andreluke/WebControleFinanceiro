@@ -34,3 +34,12 @@ export interface UpdateGoalInput {
 export interface ContributeGoalInput {
   amount: number
 }
+
+export interface GoalContribution {
+  id: string
+  goalId: string
+  transactionId: string
+  type: 'deposit' | 'withdrawal'
+  amount: number
+  createdAt: string
+}

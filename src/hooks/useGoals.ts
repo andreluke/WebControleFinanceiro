@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { GoalsService } from '@/services/goals'
-import type { CreateGoalInput, UpdateGoalInput, ContributeGoalInput } from '@/types/goal'
+import type { CreateGoalInput, UpdateGoalInput, ContributeGoalInput, GoalContribution } from '@/types/goal'
 
 export function useGoals() {
   return useQuery({
@@ -50,6 +50,20 @@ export function useContributeGoal() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['goals'] })
       queryClient.invalidateQueries({ queryKey: ['goals', id] })
+      queryClient.invalidateQueries({ queryKey: ['goals', id, 'contributions'] })
+    },
+  })
+}
+
+export function useWithdrawGoal() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, amount }: { id: string; amount: number }) =>
+      GoalsService.withdraw(id, { amount }),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] })
+      queryClient.invalidateQueries({ queryKey: ['goals', id] })
     },
   })
 }
@@ -61,6 +75,26 @@ export function useDeleteGoal() {
     mutationFn: (id: string) => GoalsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] })
+    },
+  })
+}
+
+export function useGoalContributions(goalId: string) {
+  return useQuery({
+    queryKey: ['goals', goalId, 'contributions'],
+    queryFn: () => GoalsService.getContributions(goalId),
+    enabled: !!goalId,
+  })
+}
+
+export function useRemoveContribution() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (contributionId: string) => GoalsService.removeContribution(contributionId),
+    onSuccess: (_, contributionId) => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] })
+      queryClient.invalidateQueries({ queryKey: ['goals', contributionId, 'contributions'] })
     },
   })
 }

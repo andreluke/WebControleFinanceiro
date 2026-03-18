@@ -1,4 +1,4 @@
-import { Edit, Trash2, Plus } from 'lucide-react'
+import { Edit, Trash2, ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { Button, Card, CardContent } from '@/components/ui'
 import type { Goal } from '@/types/goal'
 import { formatBRL } from '@/utils/currency'
@@ -9,12 +9,14 @@ interface GoalCardProps {
   goal: Goal
   onEdit: () => void
   onDelete: () => void
-  onContribute: () => void
+  onDeposit: () => void
+  onWithdraw: () => void
 }
 
-export function GoalCard({ goal, onEdit, onDelete, onContribute }: GoalCardProps) {
+export function GoalCard({ goal, onEdit, onDelete, onDeposit, onWithdraw }: GoalCardProps) {
   const progress = Math.min((Number(goal.currentAmount) / Number(goal.targetAmount)) * 100, 100)
   const isCompleted = Number(goal.currentAmount) >= Number(goal.targetAmount)
+  const hasBalance = Number(goal.currentAmount) > 0
 
   return (
     <Card className="border-border bg-card">
@@ -86,18 +88,40 @@ export function GoalCard({ goal, onEdit, onDelete, onContribute }: GoalCardProps
 
         {isCompleted && (
           <div className="mt-2 rounded bg-success/10 px-2 py-1 text-center text-xs font-medium text-success">
-            Meta alcançada!
+            Meta alcancada!
           </div>
         )}
 
-        {!isCompleted && (
+        <div className="mt-3 flex gap-2">
           <Button
-            className="mt-3 w-full"
+            className="flex-1"
             size="sm"
-            onClick={onContribute}
+            onClick={onDeposit}
           >
-            <Plus className="h-4 w-4" />
-            Contribuir
+            <ArrowUpRight className="h-4 w-4" />
+            Depositar
+          </Button>
+          {hasBalance && (
+            <Button
+              className="flex-1"
+              size="sm"
+              variant="outline"
+              onClick={onWithdraw}
+            >
+              <ArrowDownLeft className="h-4 w-4" />
+              Sacar
+            </Button>
+          )}
+        </div>
+        {isCompleted && (
+          <Button
+            className="mt-2 w-full"
+            size="sm"
+            variant="outline"
+            onClick={onWithdraw}
+          >
+            <ArrowDownLeft className="h-4 w-4" />
+            Sacar todo o valor
           </Button>
         )}
       </CardContent>

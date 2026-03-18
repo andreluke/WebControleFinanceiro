@@ -14,7 +14,7 @@ export default function GoalsPage() {
   const { toast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingGoal, setEditingGoal] = useState<typeof goals[0] | null>(null)
-  const [contributeMode, setContributeMode] = useState(false)
+  const [modalMode, setModalMode] = useState<'view' | 'deposit' | 'withdraw'>('view')
 
   const activeGoals = goals.filter(g => g.isActive)
   const completedGoals = goals.filter(g => g.currentAmount >= g.targetAmount)
@@ -25,14 +25,14 @@ export default function GoalsPage() {
 
   const handleEdit = (goal: typeof goals[0]) => {
     setEditingGoal(goal)
-    setContributeMode(false)
+    setModalMode('view')
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setEditingGoal(null)
-    setContributeMode(false)
+    setModalMode('view')
   }
 
   const handleDelete = async (goal: typeof goals[0]) => {
@@ -51,7 +51,7 @@ export default function GoalsPage() {
   return (
     <>
       <div>
-        <Header onCreateClick={() => { setEditingGoal(null); setContributeMode(false); setIsModalOpen(true) }} />
+        <Header onCreateClick={() => { setEditingGoal(null); setModalMode('view'); setIsModalOpen(true) }} />
 
         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <KpiCard
@@ -97,7 +97,7 @@ export default function GoalsPage() {
             ) : goals.length === 0 ? (
               <div className="flex h-32 flex-col items-center justify-center gap-2">
                 <p className="text-secondary">Nenhuma meta encontrada.</p>
-                <Button onClick={() => { setEditingGoal(null); setContributeMode(false); setIsModalOpen(true) }}>
+                <Button onClick={() => { setEditingGoal(null); setModalMode('view'); setIsModalOpen(true) }}>
                   <Plus className="h-4 w-4" />
                   Criar meta
                 </Button>
@@ -110,9 +110,14 @@ export default function GoalsPage() {
                     goal={goal}
                     onEdit={() => handleEdit(goal)}
                     onDelete={() => handleDelete(goal)}
-                    onContribute={() => {
+                    onDeposit={() => {
                       setEditingGoal(goal)
-                      setContributeMode(true)
+                      setModalMode('deposit')
+                      setIsModalOpen(true)
+                    }}
+                    onWithdraw={() => {
+                      setEditingGoal(goal)
+                      setModalMode('withdraw')
                       setIsModalOpen(true)
                     }}
                   />
@@ -128,7 +133,7 @@ export default function GoalsPage() {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           goal={editingGoal}
-          initialContributeMode={contributeMode}
+          initialMode={modalMode}
         />
       </Dialog>
 
