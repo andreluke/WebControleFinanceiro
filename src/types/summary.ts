@@ -21,3 +21,20 @@ export interface CategorySummary {
   total: number
   percentage: number
 }
+
+export interface RecurringUpcoming {
+  description: string
+  amount: number
+  type: 'income' | 'expense'
+  expectedDate: string
+}
+
+export interface Forecast {
+  currentIncome: number
+  currentExpense: number
+  projectedIncome: number
+  projectedExpense: number
+  projectedBalance: number
+  recurringUpcoming: RecurringUpcoming[]
+  confidence: 'high' | 'low'
+}

@@ -4,8 +4,10 @@ import { DashboardChartsSection } from '@/components/dashboard/DashboardChartsSe
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardKpiSection } from '@/components/dashboard/DashboardKpiSection'
 import { DashboardLatestTransactionsCard } from '@/components/dashboard/DashboardLatestTransactionsCard'
+import { ForecastCard } from '@/components/dashboard/ForecastCard'
 import { SeedExportPanel } from '@/components/dashboard/SeedExportPanel'
 import { useCategorySummary } from '@/hooks/useCategorySummary'
+import { useForecast } from '@/hooks/useSummary'
 import { useMonthlySummary } from '@/hooks/useMonthlySummary'
 import { useSummary } from '@/hooks/useSummary'
 import { useTransactions } from '@/hooks/useTransactions'
@@ -64,6 +66,7 @@ export default function DashboardPage() {
   const monthlyQuery = useMonthlySummary()
   const categoryQuery = useCategorySummary({ period: activePeriod === 'specific' ? undefined : activePeriod, month: activePeriod === 'specific' ? specificMonth : undefined })
   const latestTransactionsQuery = useTransactions(transactionsFilters)
+  const forecastQuery = useForecast()
 
   const summary = summaryQuery.data
   const latestTransactions = latestTransactionsQuery.data?.data ?? []
@@ -90,6 +93,12 @@ export default function DashboardPage() {
       <DashboardChartsSection
         monthly={{ isLoading: monthlyQuery.isLoading, isError: monthlyQuery.isError, data: monthlyQuery.data, refetch: monthlyQuery.refetch }}
         category={{ isLoading: categoryQuery.isLoading, isError: categoryQuery.isError, data: categoryQuery.data, refetch: categoryQuery.refetch }}
+      />
+            <ForecastCard
+        isLoading={forecastQuery.isLoading}
+        isError={forecastQuery.isError}
+        forecast={forecastQuery.data}
+        onRetry={forecastQuery.refetch}
       />
       <DashboardLatestTransactionsCard
         isLoading={latestTransactionsQuery.isLoading}

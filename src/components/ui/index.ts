@@ -1,4 +1,5 @@
 export { Button } from './Button'
+export { Progress } from './Progress'
 export { buttonVariants } from './button-variants'
 export { Input } from './Input'
 export { Label } from './Label'
