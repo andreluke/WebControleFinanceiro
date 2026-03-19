@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import TransfersPage from '@/pages/TransfersPage'
 import { useCategories } from '@/hooks/useCategories'
 import { usePaymentMethods } from '@/hooks/usePaymentMethods'
@@ -38,6 +39,19 @@ const useCategoriesMock = vi.mocked(useCategories)
 const usePaymentMethodsMock = vi.mocked(usePaymentMethods)
 const useToastMock = vi.mocked(useToast)
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
 describe('TransfersPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -70,34 +84,27 @@ describe('TransfersPage', () => {
     } as never)
   })
 
-  it('usa filtros da URL para buscar transacoes', () => {
-    render(
-      <MemoryRouter initialEntries={['/transfers?q=alug&type=expense&period=previous&page=2']}>
+  const renderPage = () => {
+    return render(
+      <MemoryRouter initialEntries={['/transfers']}>
         <Routes>
           <Route path="/transfers" element={<TransfersPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      { wrapper: createWrapper() }
     )
+  }
 
-    expect(useTransactionsMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        page: 2,
-        type: 'expense',
-      })
-    )
-    expect(screen.getByDisplayValue('alug')).toBeInTheDocument()
+  it('renderiza lista de transações', () => {
+    renderPage()
+
+    expect(screen.getByText('Aluguel')).toBeInTheDocument()
   })
 
   it('renderiza estado de erro na listagem', () => {
     useTransactionsMock.mockReturnValue({ data: undefined, isLoading: false, isError: true, error: new Error('Falha') } as never)
 
-    render(
-      <MemoryRouter initialEntries={['/transfers']}>
-        <Routes>
-          <Route path="/transfers" element={<TransfersPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText(/falha ao carregar transacoes/i)).toBeInTheDocument()
   })

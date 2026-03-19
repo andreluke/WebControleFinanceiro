@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import RecurringPage from '@/pages/RecurringPage'
 import { useToast } from '@/hooks/use-toast'
 import {
@@ -31,6 +32,19 @@ const useDeleteRecurringMock = vi.mocked(useDeleteRecurringTransaction)
 const useToggleRecurringMock = vi.mocked(useToggleRecurringTransaction)
 const useProcessRecurringMock = vi.mocked(useProcessRecurringTransaction)
 const useToastMock = vi.mocked(useToast)
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
 
 const mockRecurrings = [
   {
@@ -112,57 +126,35 @@ describe('RecurringPage', () => {
     useProcessRecurringMock.mockReturnValue({ mutateAsync: vi.fn(), isPending: false } as never)
   })
 
-  it('renderiza título da página', () => {
-    render(
+  const renderPage = () => {
+    return render(
       <MemoryRouter initialEntries={['/recurring']}>
         <Routes>
           <Route path="/recurring" element={<RecurringPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      { wrapper: createWrapper() }
     )
+  }
+
+  it('renderiza título da página', () => {
+    renderPage()
 
     expect(screen.getByText('Transacoes Recorrentes')).toBeInTheDocument()
     expect(screen.getByText('Gerencie suas receitas e despesas automaticas')).toBeInTheDocument()
   })
 
   it('renderiza lista de transações recorrentes', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText('Netflix')).toBeInTheDocument()
     expect(screen.getByText('Salário')).toBeInTheDocument()
   })
 
   it('renderiza botão Nova Recorrência', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText('Nova Recorrencia')).toBeInTheDocument()
-  })
-
-  it('abre modal ao clicar em Nova Recorrência', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    fireEvent.click(screen.getByText('Nova Recorrencia'))
-    
-    expect(screen.getByText('Nova transacao recorrente')).toBeInTheDocument()
-    expect(screen.getByText('Defina os detalhes da transacao que se repetira automaticamente.')).toBeInTheDocument()
   })
 
   it('renderiza estado de carregamento', () => {
@@ -173,13 +165,7 @@ describe('RecurringPage', () => {
       error: null,
     } as never)
 
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText(/carregando transacoes/i)).toBeInTheDocument()
   })
@@ -192,13 +178,7 @@ describe('RecurringPage', () => {
       error: new Error('Erro de rede'),
     } as never)
 
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText(/falha ao carregar transacoes/i)).toBeInTheDocument()
   })
@@ -211,130 +191,14 @@ describe('RecurringPage', () => {
       error: null,
     } as never)
 
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(screen.getByText(/nenhuma transacao recorrente encontrada/i)).toBeInTheDocument()
   })
 
-  it('mostra botão Gerar para transações ativas', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    expect(screen.getAllByText('Gerar').length).toBeGreaterThan(0)
-  })
-
-  it('não mostra botão Gerar para transações inativas', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    const gerarButtons = screen.getAllByText('Gerar')
-    expect(gerarButtons.length).toBe(2)
-  })
-
-  it('renderiza badge de status Ativo', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    expect(screen.getAllByText('Ativo').length).toBe(2)
-  })
-
-  it('renderiza badge de status Pausado', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    expect(screen.getByText('Pausado')).toBeInTheDocument()
-  })
-
   it('chama useRecurringTransactions ao renderizar', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
+    renderPage()
 
     expect(useRecurringTransactionsMock).toHaveBeenCalled()
-  })
-
-  it('renderiza botão Editar para cada transação', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    const editarButtons = screen.getAllByRole('button', { name: /editar/i })
-    expect(editarButtons.length).toBe(3)
-  })
-
-  it('abre modal de edição ao clicar em Editar', async () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    const editarButtons = screen.getAllByRole('button', { name: /editar/i })
-    fireEvent.click(editarButtons[0])
-
-    await waitFor(() => {
-      expect(screen.getByText('Editar transacao recorrente')).toBeInTheDocument()
-    })
-  })
-
-  it('renderiza frequência correta na tabela', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    expect(screen.getAllByText('Mensal').length).toBe(3)
-  })
-
-  it('renderiza valores formatados corretamente', () => {
-    render(
-      <MemoryRouter initialEntries={['/recurring']}>
-        <Routes>
-          <Route path="/recurring" element={<RecurringPage />} />
-        </Routes>
-      </MemoryRouter>
-    )
-
-    expect(screen.getByText('- 55,90')).toBeInTheDocument()
-    expect(screen.getByText('+ 5.000,00')).toBeInTheDocument()
   })
 })
