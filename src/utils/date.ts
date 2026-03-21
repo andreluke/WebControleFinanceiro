@@ -1,8 +1,13 @@
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 export function formatDate(date: string) {
   return format(parseISO(date), 'dd/MM/yyyy', { locale: ptBR })
+}
+
+export function formatRelativeTime(date: string) {
+  const parsedDate = parseISO(date)
+  return formatDistanceToNow(parsedDate, { addSuffix: true, locale: ptBR })
 }
 
 export function toMonthParam(date = new Date()) {

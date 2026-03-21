@@ -1,7 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ArrowLeftRight, Repeat, TrendingUp, CreditCard, Settings, Lock, LogOut, Target, PiggyBank } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, Repeat, TrendingUp, CreditCard, Settings, Lock, LogOut, Target, PiggyBank, Bell } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { AuthService } from '@/services/auth'
+import { useUnreadCount } from '@/hooks/useNotifications'
 
 const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, locked: false },
@@ -9,6 +10,7 @@ const menuItems = [
   { path: '/recurring', label: 'Recorrentes', icon: Repeat, locked: false },
   { path: '/goals', label: 'Metas', icon: PiggyBank, locked: false },
   { path: '/budgets', label: 'Orçamentos', icon: Target, locked: false },
+  { path: '/notifications', label: 'Notificacoes', icon: Bell, locked: false, hasBadge: true },
   { path: '/investments', label: 'Investimentos', icon: TrendingUp, locked: true },
   { path: '/cards', label: 'Cartoes', icon: CreditCard, locked: true },
   { path: '/settings', label: 'Configuracoes', icon: Settings, locked: true },
@@ -19,6 +21,9 @@ export default function Sidebar() {
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
+  const { data: unreadData } = useUnreadCount()
+
+  const unreadCount = unreadData?.count ?? 0
 
   const isActive = (path: string) => location.pathname === path
 
@@ -26,6 +31,7 @@ export default function Sidebar() {
     try {
       await AuthService.logout()
     } catch {
+      // Ignore logout API errors
     }
     logout()
     navigate('/login')
@@ -63,11 +69,18 @@ export default function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+              className={`group relative flex items-center gap-3 rounded-lg px-4 py-3 transition-all ${
                 active ? 'bg-primary text-white' : 'text-secondary hover:bg-muted hover:text-foreground'
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <div className="relative">
+                <Icon className="h-5 w-5" />
+                {item.hasBadge && unreadCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger text-[10px] font-medium text-white">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </div>
               <span className="text-sm font-medium">{item.label}</span>
             </Link>
           )
