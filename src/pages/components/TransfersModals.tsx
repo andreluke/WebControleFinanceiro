@@ -1,6 +1,6 @@
 import { Dialog } from '@/components/ui'
 import { TransactionModal, CategoryModal, PaymentMethodModal, SubcategoryModal } from '.'
-import type { Category } from '@/types/category'
+import type { Category, Subcategory } from '@/types/category'
 import type { PaymentMethod } from '@/types/paymentMethod'
 import type { Transaction } from '@/types/transaction'
 
@@ -10,6 +10,8 @@ interface TransfersModalsProps {
   subcategoryOpen: boolean
   paymentOpen: boolean
   transaction: Transaction | null
+  editingCategory: Category | null
+  editingSubcategory: Subcategory | null
   categories: Category[]
   paymentMethods: PaymentMethod[]
   selectedCategoryId?: string
@@ -24,6 +26,8 @@ interface TransfersModalsProps {
   onOpenCategory: () => void
   onOpenSubcategory: () => void
   onOpenPayment: () => void
+  onEditCategory: (category: Category | null) => void
+  onEditSubcategory: (subcategory: Subcategory | null) => void
 }
 
 export function TransfersModals({
@@ -32,6 +36,8 @@ export function TransfersModals({
   subcategoryOpen,
   paymentOpen,
   transaction,
+  editingCategory,
+  editingSubcategory,
   categories,
   paymentMethods,
   selectedCategoryId,
@@ -46,7 +52,19 @@ export function TransfersModals({
   onOpenCategory,
   onOpenSubcategory,
   onOpenPayment,
+  onEditCategory,
+  onEditSubcategory,
 }: TransfersModalsProps) {
+  const handleCloseCategory = () => {
+    onCloseCategory()
+    onEditCategory(null)
+  }
+
+  const handleCloseSubcategory = () => {
+    onCloseSubcategory()
+    onEditSubcategory(null)
+  }
+
   return (
     <>
       <Dialog open={transactionOpen} onOpenChange={(open) => !open && onCloseTransaction()}>
@@ -64,22 +82,24 @@ export function TransfersModals({
         />
       </Dialog>
 
-      <Dialog open={categoryOpen} onOpenChange={(open) => !open && onCloseCategory()}>
+      <Dialog open={categoryOpen} onOpenChange={(open) => !open && handleCloseCategory()}>
         <CategoryModal
           isOpen={categoryOpen}
-          onClose={onCloseCategory}
-          category={null}
+          onClose={handleCloseCategory}
+          category={editingCategory}
           categories={categories}
           onCategorySelect={onCategorySelect}
+          onEdit={onEditCategory}
         />
       </Dialog>
 
-      <Dialog open={subcategoryOpen} onOpenChange={(open) => !open && onCloseSubcategory()}>
+      <Dialog open={subcategoryOpen} onOpenChange={(open) => !open && handleCloseSubcategory()}>
         <SubcategoryModal
           isOpen={subcategoryOpen}
-          onClose={onCloseSubcategory}
-          subcategory={null}
+          onClose={handleCloseSubcategory}
+          subcategory={editingSubcategory}
           categoryId={selectedCategoryId}
+          onEdit={onEditSubcategory}
         />
       </Dialog>
 

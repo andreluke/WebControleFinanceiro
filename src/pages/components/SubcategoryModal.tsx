@@ -17,6 +17,7 @@ interface SubcategoryModalProps {
   subcategory: Subcategory | null
   categoryId?: string
   onSubcategorySelect?: (subcategoryId: string) => void
+  onEdit?: (subcategory: Subcategory | null) => void
 }
 
 const defaultValues: CreateSubcategoryInput = {
@@ -25,7 +26,7 @@ const defaultValues: CreateSubcategoryInput = {
   categoryId: '',
 }
 
-export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onSubcategorySelect }: SubcategoryModalProps) {
+export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onSubcategorySelect, onEdit }: SubcategoryModalProps) {
   const { toast } = useToast()
   const { data: categories = [] } = useCategories()
   const { data: subcategories = [] } = useSubcategories()
@@ -111,7 +112,7 @@ export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onS
                   {categories.map((cat: Category) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                        <span className="rounded-full w-2.5 h-2.5" style={{ backgroundColor: cat.color }} />
                         {cat.name}
                       </div>
                     </SelectItem>
@@ -121,21 +122,21 @@ export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onS
             )}
           />
           {form.formState.errors.categoryId && (
-            <p className="text-xs text-danger">{form.formState.errors.categoryId.message}</p>
+            <p className="text-danger text-xs">{form.formState.errors.categoryId.message}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
+        <div className="gap-4 grid grid-cols-1 md:grid-cols-[2fr_1fr]">
           <div className="space-y-2">
             <Label htmlFor="subcategory-name">Nome</Label>
             <Input id="subcategory-name" placeholder="Ex: Restaurantes" {...form.register('name')} />
             {form.formState.errors.name && (
-              <p className="text-xs text-danger">{form.formState.errors.name.message}</p>
+              <p className="text-danger text-xs">{form.formState.errors.name.message}</p>
             )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="subcategory-color">Cor</Label>
-            <Input id="subcategory-color" type="color" className="h-10 p-1" {...form.register('color')} />
+            <Input id="subcategory-color" type="color" className="p-1 h-10" {...form.register('color')} />
           </div>
         </div>
 
@@ -146,7 +147,7 @@ export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onS
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Salvando...
               </>
             ) : isEditing ? (
@@ -158,24 +159,27 @@ export function SubcategoryModal({ isOpen, onClose, subcategory, categoryId, onS
         </DialogFooter>
       </form>
 
-      <div className="space-y-2 rounded-md border border-border bg-background/40 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Subcategorias ativas</p>
-        <div className="max-h-44 space-y-2 overflow-auto pr-1">
+      <div className="space-y-2 bg-background/40 p-3 border border-border rounded-md">
+        <p className="font-semibold text-secondary text-xs uppercase tracking-wide">Subcategorias ativas</p>
+        <div className="space-y-2 pr-1 max-h-44 overflow-auto">
           {subcategories.length === 0 ? (
-            <p className="text-sm text-secondary">Nenhuma subcategoria cadastrada.</p>
+            <p className="text-secondary text-sm">Nenhuma subcategoria cadastrada.</p>
           ) : (
             subcategories.map((sub) => (
-              <div key={sub.id} className="flex items-center justify-between rounded-md border border-border/70 px-3 py-2">
+              <div key={sub.id} className="flex justify-between items-center px-3 py-2 border border-border/70 rounded-md">
                 <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: sub.color }} />
-                  <span className="text-sm text-foreground">{sub.name}</span>
+                  <span className="rounded-full w-2.5 h-2.5" style={{ backgroundColor: sub.color }} />
+                  <span className="text-foreground text-sm">{sub.name}</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => form.reset({ name: sub.name, color: sub.color, categoryId: sub.categoryId })}>
-                    <Edit className="h-4 w-4" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => {
+                    form.reset({ name: sub.name, color: sub.color, categoryId: sub.categoryId })
+                    onEdit?.(sub)
+                  }}>
+                    <Edit className="w-4 h-4" />
                   </Button>
                   <Button type="button" variant="destructive" size="sm" onClick={() => handleDelete(sub)}>
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>

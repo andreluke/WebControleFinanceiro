@@ -134,6 +134,8 @@ export default function TransfersPage() {
         subcategoryOpen={modals.subcategoryModal}
         paymentOpen={modals.paymentModal}
         transaction={modals.editingTransaction}
+        editingCategory={modals.editingCategory}
+        editingSubcategory={modals.editingSubcategory}
         categories={categories}
         paymentMethods={paymentMethods}
         selectedCategoryId={modals.selectedCategoryId}
@@ -157,6 +159,8 @@ export default function TransfersPage() {
           modals.closeTransaction()
           modals.setPaymentModal(true)
         }}
+        onEditCategory={modals.setEditingCategory}
+        onEditSubcategory={modals.setEditingSubcategory}
       />
 
       <Toaster />

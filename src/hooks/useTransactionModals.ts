@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Transaction } from '@/types/transaction'
+import type { Category, Subcategory } from '@/types/category'
 
 interface UseTransactionModalsReturn {
   transactionModal: boolean
@@ -7,6 +8,8 @@ interface UseTransactionModalsReturn {
   subcategoryModal: boolean
   paymentModal: boolean
   editingTransaction: Transaction | null
+  editingCategory: Category | null
+  editingSubcategory: Subcategory | null
   initialCategoryId: string | undefined
   initialPaymentMethodId: string | undefined
   selectedCategoryId: string | undefined
@@ -17,6 +20,8 @@ interface UseTransactionModalsReturn {
   setInitialCategoryId: (id: string | undefined) => void
   setInitialPaymentMethodId: (id: string | undefined) => void
   setSelectedCategoryId: (id: string | undefined) => void
+  setEditingCategory: (category: Category | null) => void
+  setEditingSubcategory: (subcategory: Subcategory | null) => void
   openCreate: () => void
   openEdit: (transaction: Transaction) => void
   closeTransaction: () => void
@@ -30,6 +35,8 @@ export function useTransactionModals(initialOpen = false): UseTransactionModalsR
   const [subcategoryModal, setSubcategoryModal] = useState(false)
   const [paymentModal, setPaymentModal] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null)
   const [initialCategoryId, setInitialCategoryId] = useState<string | undefined>()
   const [initialPaymentMethodId, setInitialPaymentMethodId] = useState<string | undefined>()
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>()
@@ -75,6 +82,8 @@ export function useTransactionModals(initialOpen = false): UseTransactionModalsR
     subcategoryModal,
     paymentModal,
     editingTransaction,
+    editingCategory,
+    editingSubcategory,
     initialCategoryId,
     initialPaymentMethodId,
     selectedCategoryId,
@@ -85,6 +94,8 @@ export function useTransactionModals(initialOpen = false): UseTransactionModalsR
     setInitialCategoryId,
     setInitialPaymentMethodId,
     setSelectedCategoryId,
+    setEditingCategory,
+    setEditingSubcategory,
     openCreate,
     openEdit,
     closeTransaction,

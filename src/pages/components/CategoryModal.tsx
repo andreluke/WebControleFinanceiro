@@ -16,6 +16,7 @@ interface CategoryModalProps {
   category: Category | null
   categories: Category[]
   onCategorySelect?: (categoryId: string) => void
+  onEdit?: (category: Category | null) => void
 }
 
 const defaultValues: CategoryFormData = {
@@ -23,7 +24,7 @@ const defaultValues: CategoryFormData = {
   color: '#3B82F6',
 }
 
-export function CategoryModal({ isOpen, onClose, category, categories, onCategorySelect }: CategoryModalProps) {
+export function CategoryModal({ isOpen, onClose, category, categories, onCategorySelect, onEdit }: CategoryModalProps) {
   const { toast } = useToast()
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
@@ -142,7 +143,10 @@ export function CategoryModal({ isOpen, onClose, category, categories, onCategor
                   <span className="text-sm text-foreground">{cat.name}</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => form.reset({ name: cat.name, color: cat.color })}>
+                  <Button type="button" variant="outline" size="sm" onClick={() => {
+                    form.reset({ name: cat.name, color: cat.color })
+                    onEdit?.(cat)
+                  }}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button type="button" variant="destructive" size="sm" onClick={() => handleDelete(cat)}>
