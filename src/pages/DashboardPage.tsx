@@ -16,8 +16,8 @@ import { toMonthParam } from "@/utils/date";
 import {
   PeriodSelector,
   type PeriodKey,
-  extractMonthYearFromParam,
 } from "@/components/PeriodSelector";
+import { extractMonthYearFromParam } from "@/functions/period-functions";
 
 function monthFromPeriodKey(period: PeriodKey, specificMonth?: string) {
   const now = new Date();

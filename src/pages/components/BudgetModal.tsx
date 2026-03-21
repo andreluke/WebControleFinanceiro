@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, RefreshCw, Info } from 'lucide-react'
+import { Loader2, RefreshCw } from 'lucide-react'
 import type { Category } from '@/types/category'
 import type { Budget, CreateBudgetInput } from '@/types/budget'
 import { budgetSchema } from '../BudgetsPage.schemas'
@@ -63,7 +63,6 @@ export function BudgetModal({ isOpen, onClose, budget, month, year }: BudgetModa
 
   const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' })
   const selectedSubcategoryId = useWatch({ control: form.control, name: 'subcategoryId' })
-  const selectedIsRecurring = useWatch({ control: form.control, name: 'isRecurring' })
 
   const categoriesWithSubcategories = categories.map((cat: Category) => ({
     ...cat,

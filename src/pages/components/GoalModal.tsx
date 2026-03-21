@@ -104,6 +104,7 @@ export function GoalModal({ isOpen, onClose, goal, initialMode = 'view' }: GoalM
 
   useEffect(() => {
     if (isOpen && !prevIsOpenRef.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode(initialMode)
     }
     prevIsOpenRef.current = isOpen

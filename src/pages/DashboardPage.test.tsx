@@ -24,6 +24,10 @@ vi.mock('@/components/dashboard/SeedExportPanel', () => ({
   SeedExportPanel: () => <div>SeedExportPanel</div>,
 }))
 
+vi.mock('@/components/dashboard/ForecastCard', () => ({
+  ForecastCard: () => <div>ForecastCard</div>,
+}))
+
 vi.mock('@/components/PeriodSelector', () => ({
   PeriodSelector: () => <div>PeriodSelector</div>,
   extractMonthYearFromParam: () => ({ month: undefined }),
@@ -33,9 +37,11 @@ const mockUseSummary = vi.fn()
 const mockUseMonthlySummary = vi.fn()
 const mockUseCategorySummary = vi.fn()
 const mockUseTransactions = vi.fn()
+const mockUseForecast = vi.fn()
 
 vi.mock('@/hooks/useSummary', () => ({
   useSummary: (...args: unknown[]) => mockUseSummary(...args),
+  useForecast: (...args: unknown[]) => mockUseForecast(...args),
 }))
 
 vi.mock('@/hooks/useMonthlySummary', () => ({
@@ -66,6 +72,12 @@ const createWrapper = () => {
 function mockSuccessState() {
   mockUseSummary.mockReturnValue({
     data: { totalBalance: 1000, monthlyIncome: 2000, monthlyExpense: 1000, monthlyChange: -10 },
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  })
+  mockUseForecast.mockReturnValue({
+    data: undefined,
     isLoading: false,
     isError: false,
     refetch: vi.fn(),

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { format, subMonths } from 'date-fns'
+import { useState, useEffect, useCallback } from 'react'
+import { format, subMonths, isSameMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui'
@@ -20,21 +20,34 @@ const periodOptions: Array<{ key: PeriodKey; label: string }> = [
   { key: 'specific', label: 'Período Específico' },
 ]
 
+function parseMonthFromString(monthStr: string): Date {
+  const [year, month] = monthStr.split('-')
+  return new Date(parseInt(year), parseInt(month) - 1, 1)
+}
+
 export function PeriodSelector({ activePeriod, specificMonth, onPeriodChange }: PeriodSelectorProps) {
   const [selectedMonth, setSelectedMonth] = useState(() => {
     if (specificMonth) {
-      const [year, month] = specificMonth.split('-')
-      return new Date(parseInt(year), parseInt(month) - 1, 1)
+      return parseMonthFromString(specificMonth)
     }
     return new Date()
   })
 
+  const updateSelectedMonth = useCallback((newMonth: Date) => {
+    setSelectedMonth((prev) => {
+      if (!isSameMonth(prev, newMonth)) {
+        return newMonth
+      }
+      return prev
+    })
+  }, [])
+
   useEffect(() => {
     if (specificMonth) {
-      const [year, month] = specificMonth.split('-')
-      setSelectedMonth(new Date(parseInt(year), parseInt(month) - 1, 1))
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      updateSelectedMonth(parseMonthFromString(specificMonth))
     }
-  }, [specificMonth])
+  }, [specificMonth, updateSelectedMonth])
 
   const handlePreviousMonth = () => {
     const newMonth = subMonths(selectedMonth, 1)
@@ -61,7 +74,7 @@ export function PeriodSelector({ activePeriod, specificMonth, onPeriodChange }: 
   }
 
   return (
-    <div className="mb-6 flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 mb-6">
       {periodOptions.map((period) => (
         <Button
           key={period.key}
@@ -86,11 +99,11 @@ export function PeriodSelector({ activePeriod, specificMonth, onPeriodChange }: 
             variant="outline"
             size="icon"
             onClick={handlePreviousMonth}
-            className="h-8 w-8"
+            className="w-8 h-8"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-sm font-medium min-w-[100px] text-center">
+          <span className="min-w-[100px] font-medium text-sm text-center">
             {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
           </span>
           <Button
@@ -98,47 +111,12 @@ export function PeriodSelector({ activePeriod, specificMonth, onPeriodChange }: 
             size="icon"
             onClick={handleNextMonth}
             disabled={!canGoNext()}
-            className="h-8 w-8"
+            className="w-8 h-8"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       )}
     </div>
   )
-}
-
-export function monthFromPeriod(period: PeriodKey, specificMonth?: string): string | undefined {
-  const now = new Date()
-  
-  if (period === 'specific' && specificMonth) {
-    return specificMonth
-  }
-  
-  if (period === 'previous') {
-    return format(subMonths(now, 1), 'yyyy-MM')
-  }
-  
-  if (period === 'month') {
-    return format(now, 'yyyy-MM')
-  }
-  
-  return undefined
-}
-
-export function periodFromParam(periodParam: string | null): PeriodKey {
-  if (periodParam === '7d' || periodParam === '30d' || periodParam === 'previous' || periodParam === 'month') {
-    return periodParam
-  }
-  if (periodParam?.includes('-')) {
-    return 'specific'
-  }
-  return 'month'
-}
-
-export function extractMonthYearFromParam(periodParam: string | null): { month?: string } {
-  if (periodParam && periodParam.includes('-')) {
-    return { month: periodParam }
-  }
-  return {}
 }
