@@ -106,8 +106,8 @@ export function RecurringModal({
   const { data: allSubcategories = [] } = useSubcategories();
   const { data: categories = [] } = useCategories();
 
-  const subcategories = selectedCategoryId && selectedCategoryId !== "none"
-    ? allSubcategories.filter((s: { categoryId: string }) => s.categoryId === selectedCategoryId)
+  const subcategories = selectedCategoryId && selectedCategoryId !== "none" && selectedCategoryId !== ""
+    ? allSubcategories.filter((s) => s.categoryId === selectedCategoryId)
     : [];
 
   const isEditing = !!recurring;
@@ -151,15 +151,15 @@ export function RecurringModal({
       startDate: toApiDate(values.startDate),
       endDate: values.endDate ? toApiDate(values.endDate) : undefined,
       categoryId:
-        values.categoryId && values.categoryId !== "none"
+        values.categoryId && values.categoryId !== "none" && values.categoryId !== ""
           ? values.categoryId
           : undefined,
       subcategoryId:
-        values.subcategoryId && values.subcategoryId !== "none"
+        values.subcategoryId && values.subcategoryId !== "none" && values.subcategoryId !== ""
           ? values.subcategoryId
           : undefined,
       paymentMethodId:
-        values.paymentMethodId && values.paymentMethodId !== "none"
+        values.paymentMethodId && values.paymentMethodId !== "none" && values.paymentMethodId !== ""
           ? values.paymentMethodId
           : undefined,
     };
