@@ -44,7 +44,7 @@ interface DashboardChartsSectionProps {
 
 export function DashboardChartsSection({ monthly, category }: DashboardChartsSectionProps) {
   return (
-    <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-[2fr_1fr]">
+    <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
       {monthly.isLoading ? (
         <ChartSkeleton label="Evolucao do saldo" />
       ) : monthly.isError ? (

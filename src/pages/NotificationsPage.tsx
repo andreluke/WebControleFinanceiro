@@ -97,12 +97,12 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }: Notification
           </div>
         </div>
 
-        <div className="mt-2 flex items-center gap-3 text-xs text-secondary">
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-secondary">
           <span className="rounded bg-muted px-2 py-0.5">
             {getNotificationTypeLabel(notification.type)}
           </span>
           <span>{formatDate(notification.createdAt)}</span>
-          <span>({formatRelativeTime(notification.createdAt)})</span>
+          <span className="text-muted-foreground">({formatRelativeTime(notification.createdAt)})</span>
         </div>
 
         {notification.entityType && (
@@ -175,7 +175,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Notificacoes</h1>
           <p className="text-sm text-secondary">
@@ -184,14 +184,14 @@ export default function NotificationsPage() {
         </div>
 
         {unreadCount > 0 && (
-          <Button variant="outline" onClick={handleMarkAll}>
+          <Button variant="outline" onClick={handleMarkAll} className="sm:self-start">
             <Check className="h-4 w-4" />
             Marcar todas como lidas
           </Button>
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => setFilter('all')}
