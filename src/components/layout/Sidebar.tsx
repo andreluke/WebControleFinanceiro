@@ -13,7 +13,7 @@ const menuItems = [
   { path: '/notifications', label: 'Notificacoes', icon: Bell, locked: false, hasBadge: true },
   { path: '/investments', label: 'Investimentos', icon: TrendingUp, locked: true },
   { path: '/cards', label: 'Cartoes', icon: CreditCard, locked: true },
-  { path: '/settings', label: 'Configuracoes', icon: Settings, locked: true },
+  { path: '/settings', label: 'Configuracoes', icon: Settings, locked: false },
 ]
 
 export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {

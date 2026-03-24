@@ -5,7 +5,7 @@ import ScrollToTop from '@/components/routing/ScrollToTop'
 import GlobalErrorBoundary from '@/components/routing/GlobalErrorBoundary'
 import ProtectedRoute from '@/components/routing/ProtectedRoute'
 import PageWrapper from '@/components/layout/PageWrapper'
-import { DashboardPage, HomePage, LoginPage, RecurringPage, SignupPage, TransfersPage, BudgetsPage, GoalsPage, NotificationsPage } from '@/routing/lazyPages'
+import { DashboardPage, HomePage, LoginPage, RecurringPage, SignupPage, TransfersPage, BudgetsPage, GoalsPage, NotificationsPage, SettingsPage } from '@/routing/lazyPages'
 import { notifyErrorToast } from '@/utils/errorFeedback'
 
 const queryClient = new QueryClient({
@@ -66,6 +66,7 @@ export default function App() {
                 <Route path="/budgets" element={<BudgetsPage />} />
                 <Route path="/goals" element={<GoalsPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />

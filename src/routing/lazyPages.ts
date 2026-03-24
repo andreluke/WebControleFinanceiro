@@ -9,6 +9,7 @@ const loadRecurringPage = () => import('@/pages/RecurringPage')
 const loadBudgetsPage = () => import('@/pages/BudgetsPage')
 const loadGoalsPage = () => import('@/pages/GoalsPage')
 const loadNotificationsPage = () => import('@/pages/NotificationsPage')
+const loadSettingsPage = () => import('@/pages/SettingsPage')
 
 export const HomePage = lazy(loadHomePage)
 export const LoginPage = lazy(loadLoginPage)
@@ -19,9 +20,10 @@ export const RecurringPage = lazy(loadRecurringPage)
 export const BudgetsPage = lazy(loadBudgetsPage)
 export const GoalsPage = lazy(loadGoalsPage)
 export const NotificationsPage = lazy(loadNotificationsPage)
+export const SettingsPage = lazy(loadSettingsPage)
 
 export async function preloadAuthenticatedChunks() {
-  await Promise.all([loadDashboardPage(), loadTransfersPage(), loadRecurringPage(), loadBudgetsPage(), loadGoalsPage(), loadNotificationsPage()])
+  await Promise.all([loadDashboardPage(), loadTransfersPage(), loadRecurringPage(), loadBudgetsPage(), loadGoalsPage(), loadNotificationsPage(), loadSettingsPage()])
 }
 
 export async function preloadPublicChunks() {
